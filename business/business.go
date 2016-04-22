@@ -76,6 +76,12 @@ func NewBusiness(row []string) (*Business,error) {
 
 func (bdb *BusinessDB) GetPage(page,size int) (*BusinessDB,error) {
 	businessDB := BusinessDB{}
+	if page<0 {
+		return &businessDB, errors.New(fmt.Sprintf("invalid page number %d",page))
+	}
+	if size<0 {
+		return &businessDB, errors.New(fmt.Sprintf("invalid size value %d",size))
+	}
 	start := page*size
 	end := start+size
 	if bdb.Size<start {
@@ -91,8 +97,8 @@ func (bdb *BusinessDB) GetPage(page,size int) (*BusinessDB,error) {
 }
 
 func (bdb *BusinessDB) GetBusiness(id int) (*Business,error) {
-	if len(bdb.Businesses)<=id {
-		return &Business{},errors.New("id out of range")
+	if len(bdb.Businesses)<=id || id<0 {
+		return &Business{},errors.New(fmt.Sprintf("id %d out of range",id))
 	}
 	return bdb.Businesses[id],nil
 }
