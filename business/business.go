@@ -8,6 +8,7 @@ import(
 	"github.com/dustbin/ownlocal/csv"
 )
 
+//holds a single row from the CSV contains meta data for JSON marshalling
 type Business struct {
 	ID int `json:"id"`
 	UUID string `json:"uuid"`
@@ -22,12 +23,14 @@ type Business struct {
 	Website string `json:"website"`
 	Created_at string `json:"created_at"`
 }
+//holds a group of rows and contains meta data for JSON marshalling
 type BusinessDB struct {
 	Businesses []*Business `json:"businesses"`
 	Page int `json:"page"`
 	Size int `json:"size"`
 }
 
+//creates a BusinessDB object from an io.Reader to a CSV, such as a File created by an os.Open call
 func NewBusinessDB(reader io.Reader) (*BusinessDB,error) {
 	businessDB := BusinessDB{}
 	csvdb,err := csv.NewCSVDB(reader)
@@ -47,6 +50,7 @@ func NewBusinessDB(reader io.Reader) (*BusinessDB,error) {
 	return &businessDB,nil
 }
 
+//creates a Business object from a CSV row, does basic data checking on the id
 func NewBusiness(row []string) (*Business,error) {
 	business := Business{}
 	if len(row)!=12 {
@@ -74,6 +78,7 @@ func NewBusiness(row []string) (*Business,error) {
 	return &business,nil
 }
 
+//gets a page of arbitrary size from a BusinessDB object and returns as a BusinessDB, does basic error checking
 func (bdb *BusinessDB) GetPage(page,size int) (*BusinessDB,error) {
 	businessDB := BusinessDB{}
 	if page<0 {
@@ -96,6 +101,7 @@ func (bdb *BusinessDB) GetPage(page,size int) (*BusinessDB,error) {
 	return &businessDB,nil
 }
 
+//gets a single Business object from a BusinessDB, does basic error checking
 func (bdb *BusinessDB) GetBusiness(id int) (*Business,error) {
 	if len(bdb.Businesses)<=id || id<0 {
 		return &Business{},errors.New(fmt.Sprintf("id %d out of range",id))
