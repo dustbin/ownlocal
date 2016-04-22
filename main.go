@@ -1,10 +1,11 @@
 package main
 
 import(
-	"github.com/dustbin/ownlocal/csv"
+	"encoding/json"
 	"fmt"
 	"os"
 	"log"
+	"github.com/dustbin/ownlocal/business"
 )
 
 func main(){
@@ -14,9 +15,12 @@ func main(){
 	}
 	defer file.Close()
 
-	csvdb,err := csv.NewCSVDB(file)
+	businessDB,err := business.NewBusinessDB(file)
 	if(err!=nil){
 		log.Fatal(err)
 	}
-	fmt.Println(csvdb)
+	b,err := businessDB.GetBusiness(0)
+	fmt.Println(b)
+	j,err := json.Marshal(b)
+	fmt.Println(string(j))
 }

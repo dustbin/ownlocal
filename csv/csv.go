@@ -29,6 +29,14 @@ func NewCSVDB(reader io.Reader) (*CSVDB,error) {
 	return &csvdb,nil
 }
 
+func (c *CSVDB) GetSize() int{
+	return len(c.rows)
+}
+
+func (c *CSVDB) GetRow(i int) []string{
+	return c.rows[i]
+}
+
 func (c *CSVDB) String() string{
 	return fmt.Sprintf("%v\n%d rows",c.headers,len(c.rows))
 }
