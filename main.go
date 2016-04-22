@@ -6,6 +6,7 @@ import(
 	"os"
 	"log"
 	"strconv"
+	"strings"
 	"github.com/dustbin/ownlocal/business"
 )
 
@@ -21,57 +22,71 @@ func main(){
 		log.Fatal(err)
 	}
 
-	http.HandleFunc("/business", func(w http.ResponseWriter, r *http.Request) {
-		idVal := r.FormValue("id")
-		id,err := strconv.Atoi(idVal)
+	http.HandleFunc("/business/", func(w http.ResponseWriter, r *http.Request) {
+		s := strings.Split(r.URL.EscapedPath(),"/")
+		id,err := strconv.Atoi(s[2])
 		if err!=nil {
 			w.WriteHeader(http.StatusBadRequest)
+			w.Write([]byte("400 error: non numeric id"))
 			return
 		}
 		b,err := businessDB.GetBusiness(id)
 		if err!=nil {
 			w.WriteHeader(http.StatusBadRequest)
+			w.Write([]byte("400 error: bad id"))
 			return
 		}
 		j,err := json.Marshal(b)
 		if err!=nil {
 			w.WriteHeader(http.StatusInternalServerError)
+			w.Write([]byte("500 error"))
 			return
 		}
 		w.WriteHeader(http.StatusOK)
 		w.Write(j)
 	})
 
-	http.HandleFunc("/businesses", func(w http.ResponseWriter, r *http.Request) {
+	http.HandleFunc("/businesses/", func(w http.ResponseWriter, r *http.Request) {
+		s := strings.Split(r.URL.EscapedPath(),"/")
 		page,size := 0,50
-		pageVal := r.FormValue("page")
-		if pageVal!="" {
-			page,err = strconv.Atoi(pageVal)
+		if s[2]!="" {
+			page,err = strconv.Atoi(s[2])
 			if err!=nil {
 				w.WriteHeader(http.StatusBadRequest)
+				w.Write([]byte("400 error: non numeric page number"))
+				return
+			}
+
+		}
+		if len(s)>3 && s[3]!="" {
+			size,err = strconv.Atoi(s[3])
+			if err!=nil {
+				w.WriteHeader(http.StatusBadRequest)
+				w.Write([]byte("400 error: non numberic page size"))
 				return
 			}
 		}
-		sizeVal := r.FormValue("size")
-		if sizeVal!="" {
-			size,err = strconv.Atoi(sizeVal)
-			if err!=nil {
-				w.WriteHeader(http.StatusBadRequest)
-				return
-			}
-		}
+
 		b,err := businessDB.GetPage(page,size)
 		if err!=nil {
 			w.WriteHeader(http.StatusBadRequest)
+			w.Write([]byte("400 error: bad page number"))
 			return
 		}
+
 		j,err := json.Marshal(b)
 		if err!=nil {
 			w.WriteHeader(http.StatusInternalServerError)
+			w.Write([]byte("500 error"))
 			return
 		}
 		w.WriteHeader(http.StatusOK)
 		w.Write(j)
+	})
+
+	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusNotFound)
+		w.Write([]byte("404 error"))
 	})
 
 	log.Fatal(http.ListenAndServe(":8080", nil))

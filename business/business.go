@@ -84,7 +84,7 @@ func (bdb *BusinessDB) GetPage(page,size int) (*BusinessDB,error) {
 	}
 	start := page*size
 	end := start+size
-	if bdb.Size<start {
+	if bdb.Size<=start {
 		return &businessDB, errors.New(fmt.Sprintf("invalid page %d at size %d",page,size))
 	}
 	if bdb.Size<end {
