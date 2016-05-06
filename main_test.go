@@ -6,14 +6,18 @@ import (
 )
 
 type TestResponseWriter struct {
+	headers http.Header
+	body    []byte
 }
 
 func (t TestResponseWriter) Header() (h http.Header) {
-	return
+	return t.headers
 }
 
-func (t TestResponseWriter) Write([]byte) (int, error) {
-	return 0, nil
+func (t TestResponseWriter) Write(contents []byte) (int, error) {
+	t.body = append(t.body, contents...)
+
+	return len(contents), nil
 }
 
 func (t TestResponseWriter) WriteHeader(int) {
@@ -30,7 +34,20 @@ func TestLoadCSV(t *testing.T) {
 	}
 }
 
-func TestBasicAuth(t *testing.T) {
+func TestBasicAuthSuccess(t *testing.T) {
+	canaryHandler := func(http.ResponseWriter, *http.Request) {
+	}
+
+	request, err := http.NewRequest("GET", "foo.com/businesses", TestReader{})
+	if err != nil {
+		t.Errorf("error was not nil: %#v", err)
+	}
+	request.SetBasicAuth("", "token")
+
+	MyMiddleware(TestResponseWriter{headers: http.Header{}}, request, canaryHandler)
+}
+
+func TestBasicAuthFail(t *testing.T) {
 	canaryHandler := func(http.ResponseWriter, *http.Request) {
 		t.Error("Shouldn't be called")
 	}
@@ -39,6 +56,7 @@ func TestBasicAuth(t *testing.T) {
 	if err != nil {
 		t.Errorf("error was not nil: %#v", err)
 	}
+	request.SetBasicAuth("", "fake_token")
 
-	MyMiddleware(TestResponseWriter{}, request, canaryHandler)
+	MyMiddleware(TestResponseWriter{headers: http.Header{}}, request, canaryHandler)
 }
