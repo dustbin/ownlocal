@@ -1,7 +1,5 @@
 package main
 
-import "testing"
-
 type TestReader struct {
 	contents []byte
 }
@@ -19,11 +17,12 @@ func (t TestReader) Read(p []byte) (n int, err error) {
 	return
 }
 
-func TestNewBusinessDb(t *testing.T) {
-	reader := TestReader{contents: []byte{0, 1, 2, 3}}
-
-	_, err := NewBusinessDB(reader)
-	if err != nil {
-		t.Errorf("error was not nil: %#v", err)
-	}
-}
+//
+// func TestNewBusinessDb(t *testing.T) {
+// 	reader := TestReader{contents: []byte{0, 1, 2, 3}}
+//
+// 	_, err := NewBusinessDB(reader)
+// 	if err != nil {
+// 		t.Errorf("error was not nil: %#v", err)
+// 	}
+// }
