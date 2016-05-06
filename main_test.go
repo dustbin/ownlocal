@@ -7,7 +7,7 @@ import (
 func TestLoadCSV(t *testing.T) {
 	businessDB, err := loadCSV()
 	if err != nil {
-		t.Error(err)
+		t.Errorf("error was not nil: %#v", err)
 	}
 	if businessDB == nil {
 		t.Error("nil db")
