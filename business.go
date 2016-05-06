@@ -38,10 +38,10 @@ func NewBusinessDB(reader io.Reader) (*BusinessDB, error) {
 		return &businessDB, err
 	}
 	businessDB.Page = 0
-	businessDB.Size = csvdb.GetSize()
-	businessDB.Businesses = make([]*Business, csvdb.GetSize())
-	for i := 0; i < csvdb.GetSize(); i++ {
-		business, err := NewBusiness(csvdb.GetRow(i))
+	businessDB.Size = len(csvdb.Rows)
+	businessDB.Businesses = make([]*Business, len(csvdb.Rows))
+	for i := 0; i < len(csvdb.Rows); i++ {
+		business, err := NewBusiness(csvdb.Rows[i])
 		if err != nil {
 			return &businessDB, err
 		}
