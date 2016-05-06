@@ -95,7 +95,7 @@ func main() {
 
 func MyMiddleware(rw http.ResponseWriter, r *http.Request, next http.HandlerFunc) {
 	_, password, ok := r.BasicAuth()
-	rw.Header().Add("WWW-Authenticate","Basic")
+	rw.Header().Add("WWW-Authenticate", "Basic")
 	if !ok {
 		rw.WriteHeader(http.StatusUnauthorized)
 		rw.Write([]byte("401 error: no auth provided"))
