@@ -5,11 +5,11 @@ import (
 )
 
 func TestLoadCSV(t *testing.T) {
-	businessDB,err := loadCSV()
-	if err!=nil {
+	businessDB, err := loadCSV()
+	if err != nil {
 		t.Error(err)
 	}
-	if businessDB==nil {
+	if businessDB == nil {
 		t.Error("nil db")
 	}
 }

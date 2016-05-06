@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/json"
+	"github.com/codegangsta/negroni"
 	"log"
 	"net/http"
 	"os"
@@ -15,8 +16,9 @@ func main() {
 		log.Fatal(err)
 	}
 
+	router := http.NewServeMux()
 	//handles requests to business
-	http.HandleFunc("/business/", func(w http.ResponseWriter, r *http.Request) {
+	router.HandleFunc("/business/", func(w http.ResponseWriter, r *http.Request) {
 		s := strings.Split(r.URL.EscapedPath(), "/")
 		id, err := strconv.Atoi(s[2])
 		if err != nil {
@@ -41,7 +43,7 @@ func main() {
 	})
 
 	//handles requests to businesses
-	http.HandleFunc("/businesses/", func(w http.ResponseWriter, r *http.Request) {
+	router.HandleFunc("/businesses/", func(w http.ResponseWriter, r *http.Request) {
 		s := strings.Split(r.URL.EscapedPath(), "/")
 		page, size := 0, 50
 		if s[2] != "" {
@@ -80,13 +82,31 @@ func main() {
 	})
 
 	//catch all for other requests
-	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+	router.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusNotFound)
 		w.Write([]byte("404 error"))
 	})
 
-	//starts server
-	log.Fatal(http.ListenAndServe(":8080", nil))
+	n := negroni.New()
+	n.Use(negroni.HandlerFunc(MyMiddleware))
+	n.UseHandler(router)
+	n.Run(":8080")
+}
+
+func MyMiddleware(rw http.ResponseWriter, r *http.Request, next http.HandlerFunc) {
+	_, password, ok := r.BasicAuth()
+	rw.Header().Add("WWW-Authenticate","Basic")
+	if !ok {
+		rw.WriteHeader(http.StatusUnauthorized)
+		rw.Write([]byte("401 error: no auth provided"))
+		return
+	}
+	if password != "token" {
+		rw.WriteHeader(http.StatusUnauthorized)
+		rw.Write([]byte("401 error: bad token"))
+		return
+	}
+	next(rw, r)
 }
 
 func loadCSV() (*BusinessDB, error) {

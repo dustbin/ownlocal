@@ -11,12 +11,11 @@ func TestNewCSVDB(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	csvdb,err := NewCSVDB(file)
-	if err!=nil {
+	csvdb, err := NewCSVDB(file)
+	if err != nil {
 		t.Error(err)
 	}
-	if csvdb==nil {
+	if csvdb == nil {
 		t.Error("nil db")
 	}
 }
-
