@@ -11,15 +11,7 @@ import (
 )
 
 func main() {
-	//open csv file
-	file, err := os.Open("./engineering_project_businesses.csv")
-	if err != nil {
-		log.Fatal(err)
-	}
-	defer file.Close()
-
-	//creates BusinessDB object
-	businessDB, err := business.NewBusinessDB(file)
+	businessDB, err := loadCSV()
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -96,4 +88,17 @@ func main() {
 
 	//starts server
 	log.Fatal(http.ListenAndServe(":8080", nil))
+}
+
+func loadCSV() (*business.BusinessDB, error) {
+	//open csv file
+	file, err := os.Open("./engineering_project_businesses.csv")
+	if err != nil {
+		return nil, err
+	}
+	defer file.Close()
+
+	//creates BusinessDB object
+	businessDB, err := business.NewBusinessDB(file)
+	return businessDB, err
 }
