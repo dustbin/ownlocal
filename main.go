@@ -2,7 +2,6 @@ package main
 
 import (
 	"encoding/json"
-	"github.com/dustbin/ownlocal/business"
 	"log"
 	"net/http"
 	"os"
@@ -90,7 +89,7 @@ func main() {
 	log.Fatal(http.ListenAndServe(":8080", nil))
 }
 
-func loadCSV() (*business.BusinessDB, error) {
+func loadCSV() (*BusinessDB, error) {
 	//open csv file
 	file, err := os.Open("./engineering_project_businesses.csv")
 	if err != nil {
@@ -99,6 +98,6 @@ func loadCSV() (*business.BusinessDB, error) {
 	defer file.Close()
 
 	//creates BusinessDB object
-	businessDB, err := business.NewBusinessDB(file)
+	businessDB, err := NewBusinessDB(file)
 	return businessDB, err
 }

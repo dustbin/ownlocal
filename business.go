@@ -1,9 +1,8 @@
-package business
+package main
 
 import (
 	"errors"
 	"fmt"
-	"github.com/dustbin/ownlocal/csv"
 	"io"
 	"strconv"
 )
@@ -34,7 +33,7 @@ type BusinessDB struct {
 //creates a BusinessDB object from an io.Reader to a CSV, such as a File created by an os.Open call
 func NewBusinessDB(reader io.Reader) (*BusinessDB, error) {
 	businessDB := BusinessDB{}
-	csvdb, err := csv.NewCSVDB(reader)
+	csvdb, err := NewCSVDB(reader)
 	if err != nil {
 		return &businessDB, err
 	}
